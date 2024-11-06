@@ -1,4 +1,5 @@
 #include "Object.h"
+#include"World.h"
 #include <memory>
 using namespace std;
 int main() {
@@ -9,16 +10,15 @@ int main() {
 
 
 
-	Object* player = new Object(400, 300, "Resources/L.png");
-	//player->x = (canvas.getWidth() - player->image.width) / 2;
-	//player->y = canvas.getHeight() - player->image.height /2;
+	unique_ptr<Object> player = make_unique<Player>(400, 300, Round,32,0,0,0);
+	
 
-	//World w;
+	World w;
 
 
 	Timer timer;
 
-	float MOVE_SPEED = 1000.0f;
+	float MOVE_SPEED = 600.0f;
 	while (running)
 	{
 		// Check for input (key presses or window events)
@@ -34,7 +34,7 @@ int main() {
 
 		// Get the delta time for the frame
 		float dt = timer.dt();
-		unsigned int move_amount = static_cast<unsigned int>(max(MOVE_SPEED * dt, 5.0f));
+		unsigned int move_amount = static_cast<unsigned int>(max(MOVE_SPEED * dt, 1.0f));
 		int playerX = 0;
 		int playerY = 0;
 		
@@ -67,13 +67,13 @@ int main() {
 			canvas.draw(i, 255, 255, 255); 
 		}
 		
-		//w.draw(canvas, 0);
+		w.draw(canvas, 0);
 		
 		player->draw(canvas);
 		//enemy.draw(canvas);
 		canvas.present();
 	}
 	
-	delete player;
+
 	return 0;
 }

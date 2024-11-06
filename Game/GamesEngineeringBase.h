@@ -51,6 +51,14 @@ namespace GamesEngineeringBase
 #define CANVAS_GET_X_LPARAM(lp) ((int)(short)LOWORD(lp))
 #define CANVAS_GET_Y_LPARAM(lp) ((int)(short)HIWORD(lp))
 
+	// Enum for mouse buttons
+	enum MouseButton
+	{
+		MouseLeft = 0,
+		MouseMiddle = 1,
+		MouseRight = 2
+	};
+
 	// The Window class manages the creation and rendering of a window
 	class Window
 	{
@@ -537,6 +545,30 @@ namespace GamesEngineeringBase
 			return keys[key];
 		}
 
+		// Check if a mouse button is pressed. Takes a MouseButton enum
+		bool mouseButtonPressed(MouseButton button)
+		{
+			return mouseButtons[button];
+		}
+
+		// Returns the mouse x coordinate
+		int getMouseX()
+		{
+			return mousex;
+		}
+
+		// Returns the mouse y coordinate
+		int getMouseY()
+		{
+			return mousey;
+		}
+
+		// Returns the mouse wheel value
+		int getMouseWheel()
+		{
+			return mouseWheel;
+		}
+
 		// Gets the mouse X-coordinate relative to the window, accounting for zoom
 		int getMouseInWindowX()
 		{
@@ -871,8 +903,9 @@ namespace GamesEngineeringBase
 		{
 			LARGE_INTEGER cur;
 			QueryPerformanceCounter(&cur);
+			float value = static_cast<float>(cur.QuadPart - start.QuadPart) / freq.QuadPart;
 			reset();
-			return static_cast<float>(cur.QuadPart - start.QuadPart) / freq.QuadPart;
+			return value;
 		}
 	};
 

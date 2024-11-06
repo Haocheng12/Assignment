@@ -6,11 +6,16 @@
 
 #include "GamesEngineeringBase.h"
 #include <string>
-
+#include<vector>
+#include <sstream>
+#include <iostream>
+#include <fstream>
 using namespace GamesEngineeringBase;
 using namespace std;
 
-const unsigned int tileNum = 6; // Number of tiles
+const unsigned int tileNum = 24; // Number of tiles
+const int TILE_WIDTH = 32;
+const int TILE_HEIGHT = 32;
 
 class Tile {
     Image image; // The image for the tile
@@ -18,7 +23,7 @@ class Tile {
 public:
     Tile();                  // Constructor declaration
     void load(string path);  // Load the tile from the specified path
-    void draw(Window& canvas, int y);  // Draw the tile on the canvas
+    void draw(Window& canvas, int x,int y);  // Draw the tile on the canvas
 };
 
 class TileSet {

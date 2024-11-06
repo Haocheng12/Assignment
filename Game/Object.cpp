@@ -1,12 +1,15 @@
 #include "Object.h"
 
-Object::Object(int _x, int _y, string path) {
+Object::Object(int _x, int _y, Shape _shape, int _size, int _r, int _g, int _b) {
     x = _x;
     y = _y;
-    image.load(path);
+    shape = _shape;
+    size = _size;
+    r = _r;
+    g = _g;
+    b = _b;
+    
 }
-
-
 void Object::update(int _x, int _y) {
     x += _x;
     y += _y;
@@ -17,28 +20,45 @@ void Object::update(Window& canvas, int _x, int _y) {
     y += _y;
     if (x < 0) x = 0;
     if (y < 0) y = 0;
-    if (x + image.width >= canvas.getWidth()) x = canvas.getWidth() - image.width;
-    if (y + image.height >= canvas.getHeight()) y = canvas.getHeight() - image.height;
+    if (x + size >= canvas.getWidth()) x = canvas.getWidth() - size;
+    if (y + size >= canvas.getHeight()) y = canvas.getHeight() - size;
 }
 
 void Object::draw(Window& canvas) {
-    cout << image.height;
-    cout << image.width << endl;
-   
-    for (unsigned int i = 0; i < image.height; i++)
-    {
-        for (unsigned int n = 0; n < image.width; n++)
-        {
+    
+    switch (shape) {
+    case Round: {
+        int radius = size / 2;
+        for (int i = 0; i <= size; i++) {
+            for (int j = 0; j <= size; j++) {
+                // Check if the point (j, i) lies within the circle with radius^2
+                if ((i - radius)* (i - radius) + (j - radius) * (j - radius) <= radius * radius) {
+                    int drawX = x + j;
+                    int drawY = y + i;
 
-            if ((x + n) >= 0 && (x + n) < canvas.getWidth() && (y + i) >= 0 && (y + i) < canvas.getHeight())
-            {
-                if (image.alphaAt(n, i) > 210)
-                {
-                    canvas.draw(x + n, y + i, image.at(n, i));
+                    // Ensure the point is within canvas bounds
+                    if (drawX >= 0 && drawX < canvas.getWidth() && drawY >= 0 && drawY < canvas.getHeight()) {
+                        canvas.draw(drawX, drawY, r, g, b);
+                    }
                 }
             }
         }
+        break;
     }
+    case Square: {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if ((x + j) >= 0 && (x + j) < canvas.getWidth() && (y + i) >= 0 && (y + i) < canvas.getHeight())
+                {
+
+                    canvas.draw(x + j, y + i, r, g, b);
+
+                }
+            }
+        }
+    }break;
+    }
+    
     
 
     
