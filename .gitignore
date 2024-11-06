@@ -1,32 +1,29 @@
-# Prerequisites
-*.d
+# Ignore Visual Studio temporary files, build results, and
+# folders.
+.vs/
+*.code-workspace
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+ipch/
+*.opensdf
+*.VC.opendb
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
+# Ignore build results
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+x64/
 *.exe
-*.out
-*.app
+*.dll
+*.obj
+*.pdb
+*.ilk
+*.idb
+*.ipdb
+*.iobj
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
