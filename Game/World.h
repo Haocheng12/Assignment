@@ -10,15 +10,18 @@
 using namespace GamesEngineeringBase;
 using namespace std;
 
-const int maxSize = 24;
-
+const int TILE_NUM = 24;
+const int ROWS = 42; // Set to the correct number of rows in map.txt
+const int COLS = 42; // Set to the correct number of columns in map.txt
+const int TILE_SIZE = 32;
 class World {
     TileSet tiles;
-    int a[maxSize];
+    vector<vector<int>> mapData;
 
 public:
     World();
-    void draw(Window& canvas, int wy);
+    void load();
+    void drawMap(Window& canvas, int wy);
 };
 
 #endif // WORLD_H

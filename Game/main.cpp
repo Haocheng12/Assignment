@@ -14,7 +14,7 @@ int main() {
 	
 
 	World w;
-
+	w.load();
 
 	Timer timer;
 
@@ -67,7 +67,8 @@ int main() {
 			canvas.draw(i, 255, 255, 255); 
 		}
 		
-		w.draw(canvas, 0);
+		w.drawMap(canvas, 0);
+		
 		
 		player->draw(canvas);
 		//enemy.draw(canvas);

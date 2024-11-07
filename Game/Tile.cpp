@@ -62,6 +62,8 @@ void Tile::draw(Window& canvas, int x,int y) {
     }
 }
 
+TileSet::TileSet() {}
+
 void TileSet::load() {
     for (int i = 0; i < size; i++) {
         // Load each tile from the Resources folder with a filename based on index
