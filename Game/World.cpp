@@ -8,6 +8,7 @@ World::World() {
         mapData[i] = new int[COLS](); // Initialize all elements to 0
     }
     tiles.load(); // Load tiles data
+    surviveMode = true;
 }
 World::~World() {
     for (int i = 0; i < ROWS; ++i) {

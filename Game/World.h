@@ -18,9 +18,11 @@ const int TILE_SIZE = 32;
 
 class World {
     TileSet tiles;
-    int** mapData;  
+    int** mapData; 
+   
     
 public:
+    bool surviveMode;
     World();
     ~World(); // Destructor to free allocated memory
     void load();

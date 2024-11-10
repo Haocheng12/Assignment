@@ -31,28 +31,47 @@ void Object::draw(Window& canvas) {
    
     for (unsigned int i = 0; i < image.height; i++)
     {
-        for (unsigned int n = 0; n < image.width; n++)
-        {
-            if ((x + n) >= 0 && (x + n) < canvas.getWidth()) 
+        if ((y + i) >= 0 && (y + i) < canvas.getHeight()) {
+            for (unsigned int n = 0; n < image.width; n++)
             {
-                if (image.alphaAtUnchecked(n, i) > 210)
+                if ((x + n) >= 0 && (x + n) < canvas.getWidth())
                 {
-                    canvas.draw(x + n, y + i, image.atUnchecked(n, i));
+                    if (image.alphaAtUnchecked(n, i) > 210)
+                    {
+                        canvas.draw(x + n, y + i, image.atUnchecked(n, i));
+                    }
+                }
+            }
+        }
+    } 
+}
+void Object::draw(Window& canvas,float _x,float _y) {
+
+
+    for (unsigned int i = 0; i < image.height; i++)
+    {
+        if ((_y + i) >= 0 && (_y + i) < canvas.getHeight()) {
+            for (unsigned int n = 0; n < image.width; n++)
+            {
+                if ((_x + n) >= 0 && (_x + n) < canvas.getWidth())
+                {
+                    if (image.alphaAtUnchecked(n, i) > 210)
+                    {
+                        canvas.draw(_x + n, _y + i, image.atUnchecked(n, i));
+                    }
                 }
             }
         }
     }
-    
-    
-
-    
 }
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 Player::Player(float _x, float _y, int _speed, const std::string& path)
     : Object(_x, _y, _speed, path) {
     screenX = 512.0;
     screenY = 384.0;
+    health = 100;
+    attack = 20;
+    score = 5;
 }
 
 void Player::drawPLayer(Window& canvas, Camera& cam) {
@@ -147,8 +166,7 @@ void Enemy::updateEnemy(Window& canvas, Player& player, float dt) {
     float directionX = player.screenX - x;
     float directionY = player.screenY - y;
 
-    cout << "directionX: " << directionX << endl;
-    cout << "directionY: " << directionY << endl;
+    
 
     // Calculate the magnitude (distance) of the direction vector
     float magnitude = std::sqrt(directionX * directionX + directionY * directionY);
@@ -165,16 +183,13 @@ void Enemy::updateEnemy(Window& canvas, Player& player, float dt) {
         x += normX * move_amount;
         y += normY * move_amount;
 
-        cout << "move_amount: " << move_amount << endl;
+       /* cout << "move_amount: " << move_amount << endl;
         cout << "normX: " << normX << " normY: " << normY << endl;
-        cout << "New Position -> x: " << x << " y: " << y << endl;
+        cout << "New Position -> x: " << x << " y: " << y << endl;*/
     }
 
     
-    if (x < 0) x = 0;
-    if (y < 0) y = 0;
-    if (x + image.width >= canvas.getWidth()) x = canvas.getWidth() - image.width;
-    if (y + image.height >= canvas.getHeight()) y = canvas.getHeight() - image.height;
+  
 }
 
 
@@ -192,6 +207,7 @@ bool Enemy::checkCollision(Player& player) {
 
 
 
+
 BatEnemy::BatEnemy() {}
 
 BatEnemy::BatEnemy(float _x, float _y, int _speed, string path)
@@ -199,6 +215,19 @@ BatEnemy::BatEnemy(float _x, float _y, int _speed, string path)
 }
 BatEnemy::BatEnemy(float _x, float _y) : Enemy(_x, _y, 200, "Resources/bat.png") {}
 
+DogEnemy::DogEnemy() {}
+
+DogEnemy::DogEnemy(float _x, float _y, int _speed, string path)
+    : Enemy(_x, _y, _speed, path) {
+}
+DogEnemy::DogEnemy(float _x, float _y) : Enemy(_x, _y, 100, "Resources/dog.png") {}
+
+scorpionEnemy::scorpionEnemy() {}
+
+scorpionEnemy::scorpionEnemy(float _x, float _y, int _speed, string path)
+    : Enemy(_x, _y, _speed, path) {
+}
+scorpionEnemy::scorpionEnemy(float _x, float _y) : Enemy(_x, _y, 100, "Resources/scorpion.png") {}
 
 
 
@@ -214,33 +243,46 @@ void Swarm::update(Window& canvas, Player& player, float dt, float playerX, floa
     // Spawn a new enemy if enough time has passed
     if (timeElapsed > spawnInterval) {
         // Determine random spawn location outside the screen
-        //int spawnX, spawnY;
+        int spawnX, spawnY;
 
-        //// Randomly choose one of four sides of the screen for spawning
-        //int side = rand() % 4;
+        // Randomly choose one of four sides of the screen for spawning
+        int side = rand() % 4;
+        int enemyType = rand() % 3;
+        switch (side) {
+        case 0: // Spawn above the screen
+            spawnX = rand() % (canvas.getWidth() - 64); // Ensure it spawns fully visible horizontally
+            spawnY = -64; // Spawn just above the screen
+            break;
+        case 1: // Spawn below the screen
+            spawnX = rand() % (canvas.getWidth() - 64);
+            spawnY = canvas.getHeight() + 64; // Spawn just below the screen
+            break;
+        case 2: // Spawn to the left of the screen
+            spawnX = -64;
+            spawnY = rand() % (canvas.getHeight() - 64); // Ensure it spawns fully visible vertically
+            break;
+        case 3: // Spawn to the right of the screen
+            spawnX = canvas.getWidth() + 64;
+            spawnY = rand() % (canvas.getHeight() - 64);
+            break;
+        }
 
-        //switch (side) {
-        //case 0: // Spawn above the screen
-        //    spawnX = rand() % (canvas.getWidth() - 64); // Ensure it spawns fully visible horizontally
-        //    spawnY = -64; // Spawn just above the screen
-        //    break;
-        //case 1: // Spawn below the screen
-        //    spawnX = rand() % (canvas.getWidth() - 64);
-        //    spawnY = canvas.getHeight() + 64; // Spawn just below the screen
-        //    break;
-        //case 2: // Spawn to the left of the screen
-        //    spawnX = -64;
-        //    spawnY = rand() % (canvas.getHeight() - 64); // Ensure it spawns fully visible vertically
-        //    break;
-        //case 3: // Spawn to the right of the screen
-        //    spawnX = canvas.getWidth() + 64;
-        //    spawnY = rand() % (canvas.getHeight() - 64);
-        //    break;
-        //}
+        switch (enemyType) {
+        case 0:
+            enemies.push_back(new BatEnemy(spawnX, spawnY));
+            break;
+        case 1:
+            enemies.push_back(new DogEnemy(spawnX, spawnY));
+            break;
+        case 2:
+            enemies.push_back(new scorpionEnemy(spawnX, spawnY));
+            break;
+        
+        }
 
         // Add the new enemy to the list
         
-        enemies.push_back(new BatEnemy(800, 600, 200, "Resources/bat.png"));
+        
 
         //cout << "ENEMY CREATED at (" << spawnX << ", " << spawnY << ")" << endl;
         
@@ -249,12 +291,13 @@ void Swarm::update(Window& canvas, Player& player, float dt, float playerX, floa
 
     // Update each enemy and check for collisions
     for (auto it = enemies.begin(); it != enemies.end(); ) {
-        /*if (player.screenX != 512) {
-            (*it)->x += playerX;
+        
+        if (player.screenX > 511.0&& player.screenX <513.0) {
+            (*it)->x -= playerX;
         }
-        if (player.screenY != 384) {
-            (*it)->y += playerY;
-        }*/
+        if (player.screenY > 383.0 && player.screenY < 385.0) {
+            (*it)->y -= playerY;
+        }
         (*it)->updateEnemy(canvas, player, dt);
         //cout << enemies.at(0).x << endl;
         if ((*it)->checkCollision(player)) {

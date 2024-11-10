@@ -26,12 +26,16 @@ public:
     void update(float _x, float _y);
     void update(Window& canvas, float _x, float _y);
     void draw(Window& canvas);
+    void draw(Window& canvas, float _x, float _y);
     
 
 };
 
 class Player : public Object {
 public:
+    int health;
+    int attack;
+    int score;
     float screenX, screenY;
     Player(float _x, float _y, int _speed, const std::string& path);
     void drawPLayer(Window& canvas, Camera& cam);
@@ -56,7 +60,20 @@ public:
     BatEnemy(float _x, float _y, int _speed, string path);
     
 };
+class DogEnemy : public Enemy {
+public:
+    DogEnemy();
+    DogEnemy(float _x, float _y);
+    DogEnemy(float _x, float _y, int _speed, string path);
 
+};
+class scorpionEnemy : public Enemy {
+public:
+    scorpionEnemy();
+    scorpionEnemy(float _x, float _y);
+    scorpionEnemy(float _x, float _y, int _speed, string path);
+
+};
 
 
 class Swarm {
@@ -70,6 +87,7 @@ public:
     ~Swarm();
     void update(Window& canvas, Player& player, float dt, float playerX, float playerY);
     void draw(Window& canvas);
+   
 };
 
 #endif // OBJECT_H
