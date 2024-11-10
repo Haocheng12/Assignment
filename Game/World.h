@@ -14,15 +14,18 @@ const int TILE_NUM = 24;
 const int ROWS = 42; // Set to the correct number of rows in map.txt
 const int COLS = 42; // Set to the correct number of columns in map.txt
 const int TILE_SIZE = 32;
+
+
 class World {
     TileSet tiles;
-    vector<vector<int>> mapData;
-
+    int** mapData;  
+    
 public:
-    vector<vector<int>> getMapData();
     World();
+    ~World(); // Destructor to free allocated memory
     void load();
     void drawMap(Window& canvas, int x,int y);
+    int** getMapData() const;
 };
 
 #endif // WORLD_H

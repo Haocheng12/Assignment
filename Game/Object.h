@@ -35,8 +35,8 @@ public:
     float screenX, screenY;
     Player(float _x, float _y, int _speed, const std::string& path);
     void drawPLayer(Window& canvas, Camera& cam);
-    void updatePlayer(float _x, float _y, const vector<vector<int>>& mapData);
-    bool checkCollision(const vector<vector<int>>& mapData, float newX, float newY);
+    void updatePlayer(float _x, float _y, int** mapData);
+    bool checkCollision(int** mapData, float newX, float newY);
     void respawn();
 };
 

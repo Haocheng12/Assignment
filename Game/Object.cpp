@@ -85,10 +85,20 @@ void Player::drawPLayer(Window& canvas, Camera& cam) {
         }
     }
 }
-void Player::updatePlayer(float _x, float _y, const vector<vector<int>>& mapData) {
-    
+void Player::updatePlayer(float _x, float _y, int** mapData) {
+    // Calculate potential new positions
     float newX = x + _x;
     float newY = y + _y;
+
+    // Calculate tile indices for boundary checks
+    const int mapWidth = 42 * 32;
+    const int mapHeight = 42 * 32;
+
+    // Ensure the player stays within the map bounds
+    if (newX < 0) newX = 0;
+    if (newY < 0) newY = 0;
+    if (newX + image.width >= mapWidth) newX = mapWidth - image.width;
+    if (newY + image.height >= mapHeight) newY = mapHeight - image.height;
 
     // Check for collisions before updating the position
     if (!checkCollision(mapData, newX, y)) {
@@ -97,30 +107,27 @@ void Player::updatePlayer(float _x, float _y, const vector<vector<int>>& mapData
     if (!checkCollision(mapData, x, newY)) {
         y = newY; // Move vertically if no collision
     }
-    if (x < 0) x = 0;
-    if (y < 0) y = 0;
-    if (x + image.width >= 1344) x = 1344 - image.width;
-    if (y + image.height >= 1344) y = 1344 - image.height;
-
 }
 
-bool Player::checkCollision(const vector<vector<int>>& mapData, float newX, float newY) {
+bool Player::checkCollision(int** mapData, float newX, float newY) {
     // Calculate the center of the player
-    int centerX = newX + image.width / 2-1;
-    int centerY = newY + image.height / 2+15;
+    int centerX = static_cast<int>(newX + image.width / 2 - 1);
+    int centerY = static_cast<int>(newY + image.height / 2 + 15);
 
     // Convert center coordinates to tile indices
-    int tileX = centerX / 32;
+    int tileX = centerX / 32; // Assuming TILE_SIZE is 32
     int tileY = centerY / 32;
 
-    // Get the tile ID at the center position
-    if (tileX < 0 || tileX >= mapData[0].size() || tileY < 0 || tileY >= mapData.size()) {
+    // Ensure tile indices are within bounds
+    if (tileX < 0 || tileX >= 42 || tileY < 0 || tileY >= 42) {
         return false; // No collision if out of bounds
     }
+
+    // Get the tile ID at the center position
     int tileID = mapData[tileY][tileX];
 
-    // Check if the tile ID is 1 or 2 (blocked)
-    return (tileID >= 14 && tileID <=  22);
+    // Check if the tile ID is between 14 and 22 (blocked tiles)
+    return (tileID >= 14 && tileID <= 22);
 }
 void Player::respawn() {
     // Implement respawn functionality here, if needed
