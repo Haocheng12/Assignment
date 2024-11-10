@@ -19,9 +19,10 @@ class World {
     vector<vector<int>> mapData;
 
 public:
+    vector<vector<int>> getMapData();
     World();
     void load();
-    void drawMap(Window& canvas, int wy);
+    void drawMap(Window& canvas, int x,int y);
 };
 
 #endif // WORLD_H

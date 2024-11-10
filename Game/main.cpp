@@ -1,5 +1,6 @@
 #include "Object.h"
 #include"World.h"
+#include"Camera.h"
 #include <memory>
 using namespace std;
 int main() {
@@ -8,17 +9,18 @@ int main() {
 	canvas.create(1024, 768, "Game");
 	bool running = true; // Variable to control the main loop's running state.
 
+	const int MAP_WIDTH = 1344; // Example map width
+	const int MAP_HEIGHT = 1344; // Example map height
 
-
-	unique_ptr<Object> player = make_unique<Player>(400, 300, Round,32,0,0,0);
-	
-
-	World w;
-	w.load();
+	unique_ptr<Player> player = make_unique<Player>(512.0, 384.0,500,"Resources/player.png");
+	unique_ptr<Camera> cam = make_unique<Camera>(canvas.getWidth(), canvas.getHeight(), MAP_WIDTH, MAP_HEIGHT);
+	unique_ptr<World> world = make_unique<World>();
+	world->load();
+	Swarm swarm;
 
 	Timer timer;
 
-	float MOVE_SPEED = 600.0f;
+	
 	while (running)
 	{
 		// Check for input (key presses or window events)
@@ -34,44 +36,27 @@ int main() {
 
 		// Get the delta time for the frame
 		float dt = timer.dt();
-		unsigned int move_amount = static_cast<unsigned int>(max(MOVE_SPEED * dt, 1.0f));
-		int playerX = 0;
-		int playerY = 0;
+		float move_amount = static_cast<float>(max(player->speed * dt, 1.0f));
+		float playerX = 0;
+		float playerY = 0;
 		
-		if (canvas.keyPressed('W')) // Move plane up
-		{
-			playerY -= move_amount;// Speed is adjusted based on time delta.
-		}
-		if (canvas.keyPressed('S')) // Move plane down
-		{
-			playerY += move_amount;
-		}
-		if (canvas.keyPressed('A')) // Move plane left
-		{
-			playerX -= move_amount;
-		}
-		if (canvas.keyPressed('D')) // Move plane right
-		{
-			playerX += move_amount;
-		}
+		if (canvas.keyPressed('W')) playerY -= move_amount;
+		if (canvas.keyPressed('S')) playerY += move_amount;
+		if (canvas.keyPressed('A')) playerX -= move_amount;
+		if (canvas.keyPressed('D')) playerX += move_amount;
 		
 		// Update()
-		player->update(canvas, playerX, playerY);
-		//enemy.update(canvas,dt);
+		player->updatePlayer(playerX, playerY,world->getMapData());
 
+		// Update the camera based on the player's new position
+		cam->update(player->x, player->y);
+		swarm.update(canvas, *player, dt, playerX, playerY);
+		// Draw the map with respect to the camera's position
+		world->drawMap(canvas, cam->x, cam->y);
 
-
-		// Draw();
-		for (unsigned int i = 0; i < (canvas.getWidth() * canvas.getHeight()); i++)
-		{
-			canvas.draw(i, 255, 255, 255); 
-		}
-		
-		w.drawMap(canvas, 0);
-		
-		
-		player->draw(canvas);
-		//enemy.draw(canvas);
+		// Draw the player with camera offset
+		player->drawPLayer(canvas, *cam);
+		swarm.draw(canvas);
 		canvas.present();
 	}
 	

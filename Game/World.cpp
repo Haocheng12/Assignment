@@ -5,7 +5,9 @@ World::World() : mapData(ROWS, std::vector<int>(COLS, 0)) {
     tiles.load();  // Load tiles data
 }
 
-
+vector<vector<int>> World::getMapData() {
+    return mapData;
+}
 void World::load() {
     std::ifstream mapFile("Resources/tiles/map.txt");
     std::string line;
@@ -25,23 +27,37 @@ void World::load() {
         row++;
     }
     mapFile.close();
+}
 
-    for (int i = 0; i < ROWS; ++i) {
-        for (int j = 0; j < COLS; ++j) {
-            cout << mapData[i][j] << " ";
+
+
+
+void World::drawMap(Window& canvas, int _x, int _y) {
+   
+    int tileX = _x / TILE_SIZE;
+    int tileY = _y / TILE_SIZE;
+
+    int offsetX = _x % TILE_SIZE;
+    int offsetY = _y % TILE_SIZE;
+
+    const int maxRows = 24;   
+    const int maxCols = 32;   
+
+    
+
+    for (int row = 0; row <= maxRows; ++row) { 
+        if (tileY + row >= mapData.size()) break; 
+        for (int col = 0; col <= maxCols; ++col) { 
+            if (tileX + col >= mapData[0].size()) break;
+
+            int id = mapData[tileY + row][tileX + col];
+
+   
+            int drawX = col * TILE_SIZE - offsetX;
+            int drawY = row * TILE_SIZE - offsetY;
+
+            tiles[id].draw(canvas, drawX, drawY);
         }
-        cout << endl;
     }
 }
 
-void World::drawMap(Window& canvas, int wy) {
-    // Now mapData is accessible here
-    for (int row = 0; row < ROWS; ++row) {
-        for (int col = 0; col < COLS; ++col) {
-            int id = mapData[row][col];
-            int x = col * TILE_SIZE;
-            int y = row * TILE_SIZE - wy; // Adjusting for wy if needed
-            tiles[id].draw(canvas, x, y);
-        }
-    }
-}
