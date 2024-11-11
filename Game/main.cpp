@@ -2,6 +2,7 @@
 #include"World.h"
 #include"Camera.h"
 #include "ShowTimer.h"
+#include "SaveLoad.h"
 #include <memory>
 using namespace std;
 int main() {
@@ -12,16 +13,27 @@ int main() {
 
 	
 
-	unique_ptr<Player> player = make_unique<Player>(512.0, 384.0,500,"Resources/player.png");
-	unique_ptr<Camera> cam = make_unique<Camera>(canvas.getWidth(), canvas.getHeight(), 1344, 1344);
+	unique_ptr<Player> player = make_unique<Player>(1000.0, 600.0,120,"Resources/player.png");
 	unique_ptr<World> world = make_unique<World>();
-	
 	unique_ptr<ShowTimer> showTimer = make_unique<ShowTimer>();
 	showTimer->load();
+	bool loaded = SaveLoad:: loadGame(*player, *world,*showTimer);
+	cout<< showTimer->elapsedTime;
+	if (!loaded) {
+		// Initialize new game logic (e.g., default player position, etc.)
+		player->x = 1000.0;
+		player->y = 600.0;
+		player->health = 100;
+		player->score = 0;
+		world->surviveMode = true; // Survive mode by default
+	}
+	
 	
 	Swarm swarm;
-
-	
+	float totalTime = showTimer->elapsedTime;
+	float frameTime = 0.0f;  // Time accumulated over frames
+	int frameCount = 0;      // Frame counter
+	float fps = 0.0f;
 
 	Object startMenu;
 	startMenu.image.load("Resources/menu.png");
@@ -37,6 +49,7 @@ int main() {
 		}
 		if (canvas.keyPressed('Q'))running=false;
 		startMenu.draw(canvas);
+
 		canvas.present();
 	}
 	
@@ -62,25 +75,59 @@ int main() {
 		float playerX = 0;
 		float playerY = 0;
 		
+		bool bigFireBall = false;
 		if (canvas.keyPressed('W')) playerY -= move_amount;
 		if (canvas.keyPressed('S')) playerY += move_amount;
 		if (canvas.keyPressed('A')) playerX -= move_amount;
 		if (canvas.keyPressed('D')) playerX += move_amount;
-		if (canvas.keyPressed('Q'))running = false;
+		if (canvas.keyPressed('E')) bigFireBall =true;
+		if (canvas.keyPressed('Q')) {
+			SaveLoad::saveGame(*player, *world, showTimer->elapsedTime);
+			running = false;
+		}
 		// Update()
-		player->updatePlayer(playerX, playerY,world->getMapData());
+		
+		player->updatePlayer(playerX, playerY, world->getFixedMap());
+		player->shootFireball(swarm, dt, playerX, playerY,bigFireBall);
+		swarm.checkFireballCollisions(*player);
 
+		// Generate new chunks based on player's position
+		
 		// Update the camera based on the player's new position
-		cam->update(player->x, player->y);
 		swarm.update(canvas, *player, dt, playerX, playerY);
 		// Draw the map with respect to the camera's position
-		world->drawMap(canvas, cam->x, cam->y);
+		world->drawMap(canvas,player->x, player->y);
 
 		// Draw the player with camera offset
-		player->drawPLayer(canvas, *cam);
+		player->drawPLayer(canvas);
+		player->drawFireballs(canvas);
 		swarm.draw(canvas);
+		
+		
+
+		frameTime += dt;  // Accumulate time
+		frameCount++;     // Increment frame counter
+
+		// If one second has passed, calculate FPS
+		if (frameTime >= 1.0f) {
+			fps = frameCount;  // Set FPS as the number of frames in the last second
+			frameTime = 0.0f;  // Reset time counter
+			frameCount = 0;    // Reset frame counter
+			  // Output the FPS to the console
+		}
+		showTimer->fps = fps;
 		showTimer->draw(canvas);
+
 		canvas.present();
+		totalTime += dt;
+		if (player->health <= 0) {
+			running = false;
+			SaveLoad::deleteSave();
+		}
+		if (world->surviveMode&& totalTime>120) {
+			running = false;
+			SaveLoad::deleteSave();
+		}
 	}
 	
 

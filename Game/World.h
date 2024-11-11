@@ -10,24 +10,31 @@
 using namespace GamesEngineeringBase;
 using namespace std;
 
-const int TILE_NUM = 24;
-const int ROWS = 42; // Set to the correct number of rows in map.txt
-const int COLS = 42; // Set to the correct number of columns in map.txt
 const int TILE_SIZE = 32;
-
+const int CHUNK_SIZE = 32;  // Each chunk is 32x32 tiles
+const int MAX_ROWS = 74;    // For the fixed map size
+const int MAX_COLS = 75;
 
 class World {
     TileSet tiles;
-    int** mapData; 
-   
+    int** fixedMap;         // For surviveMode (fixed map)
+    int*** chunks;          // For endless mode (dynamic map)
+    int chunkGridSize;      // Size of the chunk grid
+    int centerChunkX, centerChunkY; // Player's current chunk position
     
+
 public:
     bool surviveMode;
     World();
-    ~World(); // Destructor to free allocated memory
+    ~World();
     void load();
-    void drawMap(Window& canvas, int x,int y);
-    int** getMapData() const;
+    int** getFixedMap();
+    void generateChunk(int chunkX, int chunkY);
+    void drawMap(Window& canvas, int playerX, int playerY);
+    int getTileAt(int globalTileX, int globalTileY);
+    void expandChunks();
+    void loadFixedMap(); // New function for loading fixed map
+    void expandChunksIfNeeded(int playerX, int playerY);
 };
 
 #endif // WORLD_H

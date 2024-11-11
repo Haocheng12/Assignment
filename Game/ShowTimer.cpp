@@ -21,10 +21,11 @@ void ShowTimer::update(float dt, int _health, int _score) {
     health = _health;
     score = _score;
     elapsedTime += dt;  // Update the elapsed time with delta time (dt)
+    fps = 0;
 }
 
 
-void ShowTimer::drawText(Window& canvas, Object obj[], int number, int screenX) {
+void ShowTimer::drawText(Window& canvas, Object obj[], int number, int screenX,int screenY) {
     int temp = number;
     int numDigits = 0;
 
@@ -48,7 +49,7 @@ void ShowTimer::drawText(Window& canvas, Object obj[], int number, int screenX) 
 
     // Draw each digit using the provided 'obj' array
     for (int i = 0; i < numDigits; ++i) {
-        obj[digits[i]].draw(canvas, screenX, 5); // Use 'obj' instead of 'timeNumbers'
+        obj[digits[i]].draw(canvas, screenX, screenY); // Use 'obj' instead of 'timeNumbers'
         screenX += 24;
        
     }
@@ -60,8 +61,9 @@ void ShowTimer::drawText(Window& canvas, Object obj[], int number, int screenX) 
 void ShowTimer::draw(Window& canvas) {
     int time = static_cast<int>(elapsedTime);
 
-    drawText(canvas, timeNumbers, time, canvas.getWidth() / 2); // Draw elapsed time
-    drawText(canvas, healthNumbers, health, 0);                // Draw health
-    drawText(canvas, scoreNumbers, score, 900);               // Draw score
+    drawText(canvas, timeNumbers, time, canvas.getWidth() / 2,5); // Draw elapsed time
+    drawText(canvas, healthNumbers, health, 0,5);                // Draw health
+    drawText(canvas, scoreNumbers, score, 900,5);               // Draw score
+    drawText(canvas, scoreNumbers, fps, 900,40);
 }
 
