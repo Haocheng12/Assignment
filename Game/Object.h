@@ -32,8 +32,9 @@ public:
 
 };
 class Fireball :public Object {
-    float directionX, directionY;
+   
 public:
+    float directionX, directionY;
     bool isActive;
     bool isBig;
     // Constructor to initialize a Fireball object with its position, direction, and speed
@@ -55,8 +56,8 @@ public:
     int score;
     float screenX, screenY;
     float attackSpeed;
-    int fireballCount;           // To track how many fireballs are active
-    int fireballMax;             // Max number of fireballs the player can shoot at once
+    int fireballCount;           
+    int fireballMax;            
     float fireballCooldown;
     float bigFireballCooldown;
     Fireball** fireballs;
@@ -131,11 +132,11 @@ public:
 
 class Swarm {
 private:
-    Enemy** enemies;// Dynamic array of Enemy pointers
-    int maxEnemies;  // Max number of enemies in the swarm
-    int numEnemies;  // Current number of enemies
+    Enemy** enemies;
+    int maxEnemies;  
+    int numEnemies; 
     float timeElapsed = 0.0f;
-    float spawnInterval = 2.0f; // Spawn a new enemy every 2 seconds
+    float spawnInterval = 2.0f; 
     float  totalElapsedTime = 0.0f;
 
 public:
@@ -144,12 +145,14 @@ public:
     ~Swarm();
     void update(Window& canvas, Player& player, float dt, float playerX, float playerY);
     void draw(Window& canvas);
-    void addEnemy(Enemy* enemy);  // Method to add a new enemy
-    void removeEnemy(int index, Player& player);  // Method to remove an enemy by index
+    void addEnemy(Enemy* enemy); 
+    void removeEnemy(int index, Player& player); 
     void reduceHealth(int index, Player& player);
-    int getNumEnemies() const;  // Getter for the current number of enemies
+    int getNumEnemies() const;  
     Enemy** getEnemies() const;
     void checkFireballCollisions(Player& player);
+    void save(ofstream& saveFile) const;
+    void load(std::ifstream& loadFile);
 };
 
 #endif // OBJECT_H

@@ -140,19 +140,17 @@ bool Player::checkCollision(int** mapData, float newX, float newY) {
     int centerX = static_cast<int>(newX + image.width / 2 );
     int centerY = static_cast<int>(newY + image.height / 2 +15);
 
-    // Convert center coordinates to tile indices
-    int tileX = centerX / 32; // Assuming TILE_SIZE is 32
+    // Convert center coordinates to tile index
+    int tileX = centerX / 32; 
     int tileY = centerY / 32;
 
-    // Ensure tile indices are within bounds
     if (tileX < 0 || tileX >= 72 || tileY < 0 || tileY >= 72) {
         return false; // No collision if out of bounds
     }
-
-    // Get the tile ID at the center position
+    // Get the tile ID
     int tileID = mapData[tileY][tileX];
 
-    // Check if the tile ID is between 14 and 22 (blocked tiles)
+    // Check if the tile ID is sea
     return (tileID >= 14 && tileID <= 22);
 }
 
@@ -221,7 +219,7 @@ void Player::aoeCollision(Swarm& swarm, Fireball& fireball) {
         Enemy* enemy = swarm.getEnemies()[i];
         float distance = sqrt(pow(enemy->x - fireball.x, 2) + pow(enemy->y - fireball.y, 2));
         if (distance <= aoeRadius) {
-            // Kill the enemy within AoE range
+            // Damage  the enemy within AoE range
             swarm.reduceHealth(i,*this);
         }
         else {
@@ -269,34 +267,20 @@ Enemy::Enemy(float _x, float _y, int _speed,  string path)
    
 // Move enemy toward the player
 void Enemy::updateEnemy(Window& canvas, Player& player, float dt) {
-    // Calculate direction vector toward the player
+    // Calculate direction vector 
     float directionX = player.screenX - x;
     float directionY = player.screenY - y;
-
-    
-
-    // Calculate the magnitude (distance) of the direction vector
-    float magnitude = std::sqrt(directionX * directionX + directionY * directionY);
-
-    // Ensure we don't divide by zero
-    if (magnitude > 0.0f) {
-        // Normalize the direction vector
-        float normX = directionX / magnitude;
-        float normY = directionY / magnitude;
-
-        // Move the enemy towards the player at a constant speed
+    // Calculate the distance 
+    float distance = std::sqrt(directionX * directionX + directionY * directionY);
+    // not divide by zero
+    if (distance > 0.0f) {
+        // Normalize 
+        float normX = directionX / distance;
+        float normY = directionY / distance;
         float move_amount = speed * dt;
-
         x += normX * move_amount;
         y += normY * move_amount;
-
-       /* cout << "move_amount: " << move_amount << endl;
-        cout << "normX: " << normX << " normY: " << normY << endl;
-        cout << "New Position -> x: " << x << " y: " << y << endl;*/
     }
-
-    
-  
 }
 
 
@@ -366,17 +350,17 @@ void fireMonsterEnemy::shootFireball(Player& player, float dt ) {
         float directionY = player.screenY - y;
 
         
-        float magnitude = sqrt(directionX * directionX + directionY * directionY);
-        if (magnitude > 0) {
-            directionX /= magnitude;
-            directionY /= magnitude;
+        float distance = sqrt(directionX * directionX + directionY * directionY);
+        if (distance > 0) {
+            directionX /= distance;
+            directionY /= distance;
         }
-        cout << "fireballX " << x << "  fireballY  " << y << endl;
+       
         // Create a new fireball aimed at the player
         Fireball* fireball = new Fireball(x, y, directionX, directionY, 200, "Resources/fireball.png", false);
 
         fireballs[fireballCount] = fireball;
-        cout << "ADD bALL\n";
+       
         fireballCount++;
         fireballCooldown = 0.0f;
     }
@@ -521,33 +505,33 @@ void Swarm::update(Window& canvas, Player& player, float dt, float playerX, floa
     timeElapsed += dt;
     totalElapsedTime += dt;
     if (totalElapsedTime >= 10.0f) {
-        totalElapsedTime = 0; // Reset the timer for the next interval
-        spawnInterval = max(0.1f, spawnInterval * 0.9f); // Reduce spawn interval by 10%, minimum of 0.5 seconds
+        totalElapsedTime = 0; 
+        spawnInterval = max(0.1f, spawnInterval * 0.9f); 
         player.speed = min(400, player.speed * 1.3f);
         player.attackSpeed = max(0.5, player.attackSpeed * 0.9f);
     }
-    // Spawn a new enemy if enough time has passed
+    
     if (timeElapsed > spawnInterval) {
-        // Determine random spawn location outside the screen
+        
         int spawnX, spawnY;
 
-        // Randomly choose one of four sides of the screen for spawning
+        // Randomly choose four sides of the screen
         int side = rand() % 4;
         int enemyType = rand() % 6;
         switch (side) {
-        case 0: // Spawn above the screen
-            spawnX = rand() % (canvas.getWidth() - 64); // Ensure it spawns fully visible horizontally
-            spawnY = -64; // Spawn just above the screen
+        case 0: //  above
+            spawnX = rand() % (canvas.getWidth() - 64); 
+            spawnY = -64; 
             break;
-        case 1: // Spawn below the screen
+        case 1: //  below
             spawnX = rand() % (canvas.getWidth() - 64);
-            spawnY = canvas.getHeight() + 64; // Spawn just below the screen
+            spawnY = canvas.getHeight() + 64;
             break;
-        case 2: // Spawn to the left of the screen
+        case 2: // left 
             spawnX = -64;
-            spawnY = rand() % (canvas.getHeight() - 64); // Ensure it spawns fully visible vertically
+            spawnY = rand() % (canvas.getHeight() - 64);
             break;
-        case 3: // Spawn to the right of the screen
+        case 3: //  right o
             spawnX = canvas.getWidth() + 64;
             spawnY = rand() % (canvas.getHeight() - 64);
             break;
@@ -618,9 +602,9 @@ void Swarm::checkFireballCollisions(Player& player) {
         for (int j = 0; j < player.fireballCount; ) {
             Fireball* fireball = player.fireballs[j];
 
-            // Check if the fireball is active
+            
             if (fireball->isActive) {
-                // Perform AABB (Axis-Aligned Bounding Box) collision detection
+                
                 if (fireball->x < currentEnemy->x + currentEnemy->image.width &&
                     fireball->x + fireball->image.width > currentEnemy->x &&
                     fireball->y < currentEnemy->y + currentEnemy->image.height &&
@@ -644,7 +628,6 @@ void Swarm::checkFireballCollisions(Player& player) {
             }
         }
 
-        // If the enemy was hit, don't increment 'i' since removeEnemy shifts the array
         if (!enemyHit) {
             ++i;
         }
@@ -671,3 +654,105 @@ void Swarm::draw(Window& canvas) {
         }
     }
 }
+
+void Swarm::save(ofstream& saveFile) const {
+    // Save the number of enemies
+    saveFile << spawnInterval << "\n";
+    saveFile << numEnemies << "\n";
+
+    // Save each enemy
+    for (int i = 0; i < numEnemies; ++i) {
+        Enemy* enemy = enemies[i];
+
+        // Save enemy type
+        if (dynamic_cast<BatEnemy*>(enemy)) {
+            saveFile << "BatEnemy\n";
+        }
+        else if (dynamic_cast<DogEnemy*>(enemy)) {
+            saveFile << "DogEnemy\n";
+        }
+        else if (dynamic_cast<scorpionEnemy*>(enemy)) {
+            saveFile << "scorpionEnemy\n";
+        }
+        else if (dynamic_cast<fireMonsterEnemy*>(enemy)) {
+            saveFile << "fireMonsterEnemy\n";
+        }
+        
+
+        // Save the common enemy properties: x, y, health
+        saveFile << enemy->x << " " << enemy->y << " "
+            << enemy->health << " " << enemy->attack << " "
+            << enemy->speed << "\n";
+
+        // For fireMonsterEnemy, save fireball properties
+        if (auto fireMonster = dynamic_cast<fireMonsterEnemy*>(enemy)) {
+            cout << "fireMOnster "  << endl;
+            saveFile << fireMonster->fireballCount << "\n";  // Number of fireballs
+            for (int j = 0; j < fireMonster->fireballCount; ++j) {
+                Fireball* fireball = fireMonster->fireballs[j];
+                saveFile << fireball->x << " " << fireball->y << " "
+                    << fireball->directionX << " " << fireball->directionY << "\n";
+            }
+        }
+    }
+}
+void Swarm::load(std::ifstream& loadFile) {
+    int enemyCount;
+    loadFile >> spawnInterval;
+    loadFile >> enemyCount;  // Read the number of enemies
+    numEnemies = enemyCount;
+
+    // Clear existing enemies
+   
+
+    enemies = new Enemy * [numEnemies];  // Re-allocate memory for the enemies
+
+    for (int i = 0; i < numEnemies; ++i) {
+        std::string enemyType;
+        loadFile >> enemyType;  // Read the enemy type
+
+        // Create a new enemy based on its type
+        Enemy* enemy = nullptr;
+        if (enemyType == "BatEnemy") {
+            enemy = new BatEnemy(0,0);
+        }
+        else if (enemyType == "DogEnemy") {
+            enemy = new DogEnemy(0, 0);
+        }
+        else if (enemyType == "scorpionEnemy") {
+            enemy = new scorpionEnemy(0, 0);
+        }
+        else if (enemyType == "fireMonsterEnemy") {
+            enemy = new fireMonsterEnemy(0, 0);
+        }
+        else {
+            std::cerr << "Unknown enemy type: " << enemyType << "\n";
+            continue;
+        }
+
+        // Load common enemy properties: x, y, health, attack, speed
+        loadFile >> enemy->x >> enemy->y >> enemy->health >> enemy->attack >> enemy->speed;
+        
+        // If it's a fireMonsterEnemy, load fireball properties
+        if (auto fireMonster = dynamic_cast<fireMonsterEnemy*>(enemy)) {
+            
+            int fireballCount;
+            loadFile >> fireballCount;  // Load the number of fireballs
+            fireMonster->fireballCount = fireballCount;
+            
+            // Allocate memory for fireballs
+            
+            for (int j = 0; j < fireballCount; ++j) {
+                float fireballX, fireballY, directionX, directionY;
+                loadFile >> fireballX >> fireballY >> directionX >> directionY;
+
+                // Create a fireball object and store it
+                fireMonster->fireballs[j] = new Fireball(fireballX, fireballY, directionX, directionY, 200, "Resources/fireball.png", false);
+            }
+        }
+
+        // Add the enemy to the swarm
+        enemies[i] = enemy;
+    }
+}
+

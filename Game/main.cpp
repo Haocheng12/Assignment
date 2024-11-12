@@ -16,20 +16,11 @@ int main() {
 	unique_ptr<Player> player = make_unique<Player>(1000.0, 600.0,120,"Resources/player.png");
 	unique_ptr<World> world = make_unique<World>();
 	unique_ptr<ShowTimer> showTimer = make_unique<ShowTimer>();
+	
 	showTimer->load();
-	bool loaded = SaveLoad:: loadGame(*player, *world,*showTimer);
-	cout<< showTimer->elapsedTime;
-	if (!loaded) {
-		// Initialize new game logic (e.g., default player position, etc.)
-		player->x = 1000.0;
-		player->y = 600.0;
-		player->health = 100;
-		player->score = 0;
-		world->surviveMode = true; // Survive mode by default
-	}
 	
 	
-	Swarm swarm;
+	
 	float totalTime = showTimer->elapsedTime;
 	float frameTime = 0.0f;  // Time accumulated over frames
 	int frameCount = 0;      // Frame counter
@@ -45,6 +36,8 @@ int main() {
 		if (canvas.keyPressed('E'))break;
 		if (canvas.keyPressed('W')) {
 			world->surviveMode = false;
+			player->x = 35 * 32 / 2;
+			player->y = 35 * 32 / 2;
 			break;
 		}
 		if (canvas.keyPressed('Q'))running=false;
@@ -52,8 +45,12 @@ int main() {
 
 		canvas.present();
 	}
+	Swarm swarm;
+	bool loaded = SaveLoad::loadGame(*player, *world, *showTimer, swarm);
+
 	
-	world->load();
+	cout << loaded << endl;
+	world->load(loaded);
 	Timer timer;
 	while (running)
 	{
@@ -81,13 +78,10 @@ int main() {
 		if (canvas.keyPressed('A')) playerX -= move_amount;
 		if (canvas.keyPressed('D')) playerX += move_amount;
 		if (canvas.keyPressed('E')) bigFireBall =true;
-		if (canvas.keyPressed('Q')) {
-			SaveLoad::saveGame(*player, *world, showTimer->elapsedTime);
-			running = false;
-		}
+		
 		// Update()
 		
-		player->updatePlayer(playerX, playerY, world->getFixedMap());
+		player->updatePlayer(playerX, playerY, world->getMap());
 		player->shootFireball(swarm, dt, playerX, playerY,bigFireBall);
 		swarm.checkFireballCollisions(*player);
 
@@ -96,7 +90,7 @@ int main() {
 		// Update the camera based on the player's new position
 		swarm.update(canvas, *player, dt, playerX, playerY);
 		// Draw the map with respect to the camera's position
-		world->drawMap(canvas,player->x, player->y);
+		world->drawMap(canvas,*player,player->x, player->y);
 
 		// Draw the player with camera offset
 		player->drawPLayer(canvas);
@@ -120,13 +114,20 @@ int main() {
 
 		canvas.present();
 		totalTime += dt;
+
+		
+
 		if (player->health <= 0) {
 			running = false;
-			SaveLoad::deleteSave();
+			SaveLoad::deleteSave(world->surviveMode);
 		}
 		if (world->surviveMode&& totalTime>120) {
 			running = false;
-			SaveLoad::deleteSave();
+			SaveLoad::deleteSave(world->surviveMode);
+		}
+		if (canvas.keyPressed('Q')) {
+			SaveLoad::saveGame(*player, *world, showTimer->elapsedTime, swarm);
+			running = false;
 		}
 	}
 	
